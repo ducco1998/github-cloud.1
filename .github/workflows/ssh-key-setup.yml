@@ -1,0 +1,23 @@
+name: SSH Key Setup
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  generate-ssh-key:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate SSH Key
+        run: |
+          ssh-keygen -t rsa -b 4096 -C "your_email@example.com" -f ~/.ssh/id_rsa -N ""
+
+  add-ssh-key-to-github:
+    runs-on: ubuntu-latest
+    needs: generate-ssh-key
+    steps:
+      - name: Add SSH Key to GitHub
+        run: |
+          gh auth login --with-token ${{ secrets.GITHUB_TOKEN }}
+          gh ssh-key add ~/.ssh/id_rsa.pub --title "GitHub Actions SSH Key"
